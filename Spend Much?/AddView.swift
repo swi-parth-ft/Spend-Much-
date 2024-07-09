@@ -7,11 +7,17 @@
 
 import SwiftUI
 
+enum Currency: String, CaseIterable {
+    case CAD = "CAD"
+    case USD = "USD"
+    case INR = "INR"
+}
+
 struct AddView: View {
     @State private var name = ""
     @State private var type = "Personal"
     @State private var amount: Double = 0.0
-
+    @State private var currency: Currency = .USD
     let types = ["Business", "Personal"]
     var expenses: Expance
     @Environment(\.dismiss) var dismiss
@@ -43,17 +49,29 @@ struct AddView: View {
                     .pickerStyle(.segmented)
                     .listRowBackground(Color.white.opacity(0.4))
                     
-                    TextField("Amount", value: $amount, format: .number)
+                    HStack {
+                        TextField("Amount", value: $amount, format: .number)
                             .keyboardType(.decimalPad)
-                            .listRowBackground(Color.white.opacity(0.4))
+                            
+                        Picker("Currency", selection: $currency) {
+                            ForEach(Currency.allCases, id: \.self) {
+                                Text($0.rawValue)
+                            }
+                        }
+                        
+                        
+                    }
+                    .listRowBackground(Color.white.opacity(0.4))
                     
                     }
                 .toolbar {
                     Button("Save") {
-                        let item = Item(name: name, type: type, amount: amount)
-                        expenses.items.append(item)
-                        expenses.calculateTotals()
-                        dismiss()
+                        withAnimation {
+                            let item = Item(name: name, type: type, amount: amount, currency: currency.rawValue)
+                            expenses.items.append(item)
+                            expenses.calculateTotals()
+                            dismiss()
+                        }
                     }
                     .buttonStyle()
                 }

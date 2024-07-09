@@ -9,11 +9,13 @@ import SwiftUI
 import Observation
 
 
+
 struct Item: Identifiable, Codable {
     var id = UUID()
     var name: String
     var type: String
     var amount: Double
+    var currency: String
 }
 
 @Observable
@@ -118,9 +120,9 @@ struct ContentView: View {
                                 }
                                 
                                 Spacer()
-                                Text(item.amount, format: .currency(code: "USD"))
+                                Text(item.amount, format: .currency(code: item.currency))
                             }
-                            .listRowBackground(Color.white.opacity(0.4))
+                            .listRowBackground(Color.white.opacity(item.amount < 10 ? 0.4 : (item.amount < 100 && item.amount > 10) ? 0.6 : 0.8))
                             
                         }
                         .onDelete(perform: removeItems)
