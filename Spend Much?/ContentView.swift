@@ -9,8 +9,8 @@ import SwiftUI
 import Observation
 
 
-struct Item: Identifiable {
-    let id = UUID()
+struct Item: Identifiable, Codable {
+    var id = UUID()
     var name: String
     var type: String
     var amount: Double
@@ -18,7 +18,25 @@ struct Item: Identifiable {
 
 @Observable
 class Expance {
-    var items = [Item]()
+    var items = [Item](){
+        didSet {
+            if let encoded = try? JSONEncoder().encode(items) {
+                UserDefaults.standard.set(encoded, forKey: "Items")
+            }
+        }
+    }
+    
+    init() {
+        if let savedItems = UserDefaults.standard.data(forKey: "Items") {
+            if let decodedItems = try? JSONDecoder().decode([Item].self, from: savedItems) {
+                items = decodedItems
+                return
+            }
+        }
+
+        items = []
+    }
+    
 }
 
 struct ContentView: View {
