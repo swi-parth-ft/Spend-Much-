@@ -58,28 +58,40 @@ struct ContentView: View {
     @State private var totalPersonal: Double = 0.0
     @State private var totalBusiness: Double = 0.0
     
+    init() {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+    }
+    
+    
     var body: some View {
         NavigationStack {
             ZStack {
+                MeshGradient(width: 3, height: 3, points: [
+                    [0, 0], [0.5, 0], [1, 0],
+                    [0, 0.5], [0.5, 0.5], [1, 0.5],
+                    [0, 1], [0.5, 1], [1, 1]
+                ], colors: [
+                    .purple, .purple, .white,
+                    .purple, .white, .purple,
+                    .white, .white, .purple
+                ])
+                .ignoresSafeArea()
+                
                 VStack {
                     ZStack {
-                        MeshGradient(width: 3, height: 3, points: [
-                            [0, 0], [0.5, 0], [1, 0],
-                            [0, 0.5], [0.5, 0.5], [1, 0.5],
-                            [0, 1], [0.5, 1], [1, 1]
-                        ], colors: [
-                            .orange, .white, .blue,
-                            .orange, .white, .blue,
-                            .orange, .white, .blue
-                        ])
-                        .clipShape(RoundedRectangle(cornerRadius: 20)) // Clip the gradient to match the RoundedRectangle
+                        
+                        
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(.white)
+                            .opacity(0.4)
+                            .shadow(radius: 10)
+                            .frame(height: 110)
                             .padding()
+                        
                         HStack {
                             VStack {
                                 Text("Personal")
                                 Text("\(expance.totalPersonal, format: .currency(code: "USD"))")
-                                
-
                             }
                             Spacer()
                             VStack {
@@ -94,28 +106,33 @@ struct ContentView: View {
                     .frame(height: 150)
                    
                 List {
-                    ForEach(expance.items) { item in
-                        
-                        
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(item.name)
-                                    .font(.headline)
-                                Text(item.type)
-                            }
+                    Section(header: Text("All entries").foregroundColor(.white)) {
+                        ForEach(expance.items) { item in
                             
-                            Spacer()
-                            Text(item.amount, format: .currency(code: "USD"))
+                            
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(item.name)
+                                        .font(.headline)
+                                    Text(item.type)
+                                }
+                                
+                                Spacer()
+                                Text(item.amount, format: .currency(code: "USD"))
+                            }
+                            .listRowBackground(Color.white.opacity(0.4))
+                            
                         }
-                        
+                        .onDelete(perform: removeItems)
                     }
-                    .onDelete(perform: removeItems)
                 }
+                .scrollContentBackground(.hidden)
                 .navigationTitle("Expenses")
                 .toolbar {
                     Button("Add Expense", systemImage: "plus") {
                         showingAddExpense = true
                     }
+                    .buttonStyle()
                 }
                 .sheet(isPresented: $showingAddExpense) {
                     // show an AddView here
@@ -137,6 +154,21 @@ struct ContentView: View {
     
 }
 
+struct ButtonViewModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+        .buttonStyle(.borderedProminent)
+        .tint(.purple.opacity(0.4))
+        .cornerRadius(20)
+        .shadow(radius: 10)
+    }
+}
+
+extension View {
+    func buttonStyle() -> some View {
+        modifier(ButtonViewModifier())
+    }
+}
 
 #Preview {
     ContentView()
