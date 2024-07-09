@@ -16,6 +16,7 @@ struct Item: Identifiable, Codable {
     var type: String
     var amount: Double
     var currency: String
+
 }
 
 @Observable
@@ -56,7 +57,9 @@ class Expance {
 struct ContentView: View {
     @State private var expance = Expance()
     @State private var showingAddExpense = false
-    
+    @State private var showingPersonalList = false
+    @State private var showingBusinessList = false
+    @State private var choosedType = "Personal"
     @State private var totalPersonal: Double = 0.0
     @State private var totalBusiness: Double = 0.0
     
@@ -95,10 +98,24 @@ struct ContentView: View {
                                 Text("Personal")
                                 Text("\(expance.totalPersonal, format: .currency(code: "USD"))")
                             }
+                            .onTapGesture {
+                                showingPersonalList = true
+                            }
+                            .sheet(isPresented: $showingPersonalList) {
+                                SplitList(expenses: expance, type: "Personal")
+                                    .presentationDetents([.fraction(0.4), .medium, .large])
+                            }
                             Spacer()
                             VStack {
                                 Text("Business")
                                 Text("\(expance.totalBusiness, format: .currency(code: "USD"))")
+                            }
+                            .onTapGesture {
+                                showingBusinessList = true
+                            }
+                            .sheet(isPresented: $showingBusinessList) {
+                                SplitList(expenses: expance, type: "Business")
+                                    .presentationDetents([.fraction(0.4), .medium, .large])
                             }
                         }
                         .padding(55)
@@ -148,7 +165,8 @@ struct ContentView: View {
     }
     
     func removeItems(at offsets: IndexSet) {
-        expance.items.remove(atOffsets: offsets)
+       expance.items.remove(atOffsets: offsets)
+      
         expance.calculateTotals()
     }
   
