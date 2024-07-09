@@ -10,7 +10,7 @@ import SwiftUI
 struct AddView: View {
     @State private var name = ""
     @State private var type = "Personal"
-    @State private var amount = 0.0
+    @State private var amount: Double = 0.0
 
     let types = ["Business", "Personal"]
     var expenses: Expance
@@ -19,26 +19,45 @@ struct AddView: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                TextField("Name", text: $name)
-
-                Picker("Type", selection: $type) {
-                    ForEach(types, id: \.self) {
-                        Text($0)
+            ZStack {
+                MeshGradient(width: 3, height: 3, points: [
+                    [0, 0], [0.5, 0], [1, 0],
+                    [0, 0.5], [0.5, 0.5], [1, 0.5],
+                    [0, 1], [0.5, 1], [1, 1]
+                ], colors: [
+                    .purple, .white, .white,
+                    .purple, .purple, .white,
+                    .purple, .purple, .purple
+                ])
+                .ignoresSafeArea()
+                
+                Form {
+                    TextField("Name", text: $name)
+                        .listRowBackground(Color.white.opacity(0.4))
+                    
+                    Picker("Type", selection: $type) {
+                        ForEach(types, id: \.self) {
+                            Text($0)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .listRowBackground(Color.white.opacity(0.4))
+                    
+                    TextField("Amount", value: $amount, format: .number)
+                            .keyboardType(.decimalPad)
+                            .listRowBackground(Color.white.opacity(0.4))
+                    
+                    }
+                .toolbar {
+                    Button("Save") {
+                        let item = Item(name: name, type: type, amount: amount)
+                        expenses.items.append(item)
+                        expenses.calculateTotals()
+                        dismiss()
+                    }
+                    .buttonStyle()
                 }
-
-                TextField("Amount", value: $amount, format: .currency(code: "USD"))
-                    .keyboardType(.decimalPad)
-            }
-            .navigationTitle("Add new expense")
-            .toolbar {
-                Button("Save") {
-                    let item = Item(name: name, type: type, amount: amount)
-                    expenses.items.append(item)
-                    expenses.calculateTotals()
-                    dismiss()
-                }
+                .scrollContentBackground(.hidden)
             }
         }
     }

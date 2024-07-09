@@ -137,6 +137,7 @@ struct ContentView: View {
                 .sheet(isPresented: $showingAddExpense) {
                     // show an AddView here
                     AddView(expenses: expance)
+                        .presentationDetents([.fraction(0.4), .medium, .large])
                 }
             }
         }
