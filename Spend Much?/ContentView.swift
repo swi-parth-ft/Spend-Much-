@@ -69,10 +69,10 @@ struct ContentView: View {
                             .onTapGesture {
                                 showingPersonalList = true
                             }
-//                            .sheet(isPresented: $showingPersonalList) {
-//                                SplitList(expenses: expance, type: "Personal")
-//                                    .presentationDetents([.fraction(0.4), .medium, .large])
-//                            }
+                            .sheet(isPresented: $showingPersonalList) {
+                                SplitList(type: "Personal", totalPersonal: $totalPersonal, totalBusiness: $totalBusiness)
+                                    
+                            }
                             Spacer()
                             VStack {
                                 Text("Business")
@@ -81,10 +81,10 @@ struct ContentView: View {
                             .onTapGesture {
                                 showingBusinessList = true
                             }
-//                            .sheet(isPresented: $showingBusinessList) {
-//                                SplitList(expenses: expance, type: "Business")
-//                                    .presentationDetents([.fraction(0.4), .medium, .large])
-//                            }
+                            .sheet(isPresented: $showingBusinessList) {
+                                SplitList(type: "Business", totalPersonal: $totalPersonal, totalBusiness: $totalBusiness)
+                                   
+                            }
                         }
                         .padding(55)
 
