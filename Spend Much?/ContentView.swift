@@ -11,7 +11,7 @@ import Observation
 struct ContentView: View {
     
     @Environment(\.modelContext) var modelContext
-    @Query var items: [Items]
+    
     
     @State private var showingAddExpense = false
     @State private var showingPersonalList = false
@@ -20,12 +20,25 @@ struct ContentView: View {
     @State private var totalPersonal: Double = 0.0
     @State private var totalBusiness: Double = 0.0
     
+    
+    @State private var sortOrder = [
+        SortDescriptor(\Items.name),
+        SortDescriptor(\Items.amount),
+    ]
+    
+    @Query var items: [Items]
+    
+    
     init() {
         UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.white]
     }
     
     
     var body: some View {
+        
+        
+        
+        
         NavigationStack {
             ZStack {
                 MeshGradient(width: 3, height: 3, points: [
@@ -79,28 +92,9 @@ struct ContentView: View {
                     }
                     .frame(height: 150)
                    
-                List {
-                    Section(header: Text("All entries").foregroundColor(.white)) {
-                        ForEach(items) { item in
-                            
-                            
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(item.name)
-                                        .font(.headline)
-                                    Text(item.type)
-                                }
-                                
-                                Spacer()
-                                Text(item.amount, format: .currency(code: item.currency))
-                            }
-                            .listRowBackground(Color.white.opacity(item.amount < 10 ? 0.4 : (item.amount < 100 && item.amount > 10) ? 0.6 : 0.8))
-                            
-                        }
-                        .onDelete(perform: deleteItems)
-                    }
-                }
+                    ListView(totalPersonal: $totalPersonal, totalBusiness: $totalBusiness, sortOrder: sortOrder)
                 .scrollContentBackground(.hidden)
+                    
                 .navigationTitle("Expenses")
                 .toolbar {
                  
@@ -108,6 +102,24 @@ struct ContentView: View {
                             showingAddExpense = true
                         }
                         .buttonStyle()
+                    
+                    Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                        Picker("Sort By", selection: $sortOrder) {
+                            Text("Sort by name")
+                                .tag([
+                                    SortDescriptor(\Items.name),
+                                    SortDescriptor(\Items.amount),
+                                ])
+                            
+                            Text("Sort by Amount")
+                                .tag([
+                                    SortDescriptor(\Items.amount),
+                                    SortDescriptor(\Items.name),
+                                ])
+                        }
+                    }
+                    .buttonStyle()
+
                     
                     
                 }
@@ -118,11 +130,58 @@ struct ContentView: View {
                 .onAppear {
                     calculateTotal()
                 }
+                
             }
         }
            
         }
     }
+    
+    
+ 
+    func calculateTotal() {
+        totalPersonal = items.filter { $0.type == "Personal" }.map { $0.amount }.reduce(0, +)
+        totalBusiness = items.filter { $0.type == "Business" }.map { $0.amount }.reduce(0, +)
+    }
+}
+
+struct ListView: View {
+    @Query var items: [Items]
+    @Environment(\.modelContext) var modelContext
+    
+    @Binding var totalPersonal: Double
+    @Binding var totalBusiness: Double
+    var sortOrder: [SortDescriptor<Items>]
+    
+    
+    var body: some View {
+        List {
+            Section(header: Text("All entries").foregroundColor(.white)) {
+                ForEach(items.sorted(using: sortOrder)) { item in
+                    
+                    
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        
+                        Spacer()
+                        Text(item.amount, format: .currency(code: item.currency))
+                    }
+                    .listRowBackground(Color.white.opacity(item.amount < 10 ? 0.4 : (item.amount < 100 && item.amount > 10) ? 0.6 : 0.8))
+                    
+                }
+                .onDelete(perform: deleteItems)
+            }
+        }
+    }
+    
+//    init(sortDescriptor: [SortDescriptor<Items>]) {
+//        _items = Query(sort: sortDescriptor)
+//    }
+    
     
     func deleteItems(_ indexSet: IndexSet) {
         for i in indexSet {
@@ -136,13 +195,8 @@ struct ContentView: View {
         }
         
     }
- 
-    func calculateTotal() {
-        totalPersonal = items.filter { $0.type == "Personal" }.map { $0.amount }.reduce(0, +)
-        totalBusiness = items.filter { $0.type == "Business" }.map { $0.amount }.reduce(0, +)
-    }
+    
 }
-
 struct ButtonViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
