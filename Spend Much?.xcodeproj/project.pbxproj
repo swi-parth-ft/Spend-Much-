@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07234A7D2C42D83600CEE14D /* Items.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07234A7C2C42D83600CEE14D /* Items.swift */; };
 		075794DB2C3D83FD00740926 /* SplitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075794DA2C3D83FD00740926 /* SplitList.swift */; };
 		07D3C2F02C3CAA7700189A7E /* Spend_Much_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D3C2EF2C3CAA7700189A7E /* Spend_Much_App.swift */; };
 		07D3C2F22C3CAA7700189A7E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D3C2F12C3CAA7700189A7E /* ContentView.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		07234A7C2C42D83600CEE14D /* Items.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Items.swift; sourceTree = "<group>"; };
 		075794DA2C3D83FD00740926 /* SplitList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitList.swift; sourceTree = "<group>"; };
 		07D3C2EC2C3CAA7700189A7E /* Spend Much?.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spend Much?.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		07D3C2EF2C3CAA7700189A7E /* Spend_Much_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spend_Much_App.swift; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 				07D3C2EF2C3CAA7700189A7E /* Spend_Much_App.swift */,
 				07D3C2F12C3CAA7700189A7E /* ContentView.swift */,
 				075794DA2C3D83FD00740926 /* SplitList.swift */,
+				07234A7C2C42D83600CEE14D /* Items.swift */,
 				07D3C3172C3CC02A00189A7E /* AddView.swift */,
 				07D3C2F32C3CAA7900189A7E /* Assets.xcassets */,
 				07D3C2F52C3CAA7900189A7E /* Preview Content */,
@@ -144,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07D3C2F22C3CAA7700189A7E /* ContentView.swift in Sources */,
+				07234A7D2C42D83600CEE14D /* Items.swift in Sources */,
 				07D3C2F02C3CAA7700189A7E /* Spend_Much_App.swift in Sources */,
 				075794DB2C3D83FD00740926 /* SplitList.swift in Sources */,
 				07D3C3182C3CC02A00189A7E /* AddView.swift in Sources */,

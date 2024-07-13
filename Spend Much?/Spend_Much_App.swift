@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct Spend_Much_App: App {
@@ -13,5 +14,6 @@ struct Spend_Much_App: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Items.self)
     }
 }

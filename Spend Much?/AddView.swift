@@ -4,7 +4,7 @@
 //
 //  Created by Parth Antala on 2024-07-08.
 //
-
+import SwiftData
 import SwiftUI
 
 enum Currency: String, CaseIterable {
@@ -14,14 +14,20 @@ enum Currency: String, CaseIterable {
 }
 
 struct AddView: View {
+    @Environment(\.modelContext) var modelContext
+    @Query var items: [Items]
+    
     @State private var name = ""
     @State private var type = "Personal"
     @State private var amount: Double = 0.0
     @State private var currency: Currency = .USD
     let types = ["Business", "Personal"]
-    var expenses: Expance
+   
     @Environment(\.dismiss) var dismiss
+    @State private var title: String = "Add Expense"
     
+    @Binding var totalPersonal: Double
+    @Binding var totalBusiness: Double
     
     var body: some View {
         NavigationStack {
@@ -67,9 +73,13 @@ struct AddView: View {
                 .toolbar {
                     Button("Save") {
                         withAnimation {
-                            let item = Item(name: name, type: type, amount: amount, currency: currency.rawValue)
-                            expenses.items.append(item)
-                            expenses.calculateTotals()
+                            let item = Items(name: name, type: type, amount: amount, currency: currency.rawValue)
+                            modelContext.insert(item)
+                            if item.type == "Personal" {
+                                totalPersonal += item.amount
+                            } else {
+                                totalBusiness += item.amount
+                            }
                             dismiss()
                         }
                     }
@@ -78,9 +88,13 @@ struct AddView: View {
                 .scrollContentBackground(.hidden)
             }
         }
+        
     }
+
+    
+    
 }
 
-#Preview {
-    AddView(expenses: Expance())
-}
+//#Preview {
+//    AddView(expance = Expance())
+//}

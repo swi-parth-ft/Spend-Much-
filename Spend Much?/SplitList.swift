@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SplitList: View {
-    var expenses: Expance
     var type: String
     @State private var contentView = ContentView()
     
@@ -28,28 +27,28 @@ struct SplitList: View {
                 .ignoresSafeArea()
                 
                 List {
-                    Section(header: Text("").foregroundColor(.white)) {
-                        ForEach(expenses.items.filter { $0.type == type }) { item in
-                            
-                            
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(item.name)
-                                        .font(.headline)
-                                    Text(item.type)
-                                }
-                                
-                                Spacer()
-                                Text(item.amount, format: .currency(code: item.currency))
-                            }
-                            .listRowBackground(Color.white.opacity(item.amount < 10 ? 0.4 : (item.amount < 100 && item.amount > 10) ? 0.6 : 0.8))
-                            
-                        }
-                        .onDelete {
-                            contentView.removeItems(at: $0)
-                            expenses.calculateTotals()
-                        }
-                    }
+//                    Section(header: Text("").foregroundColor(.white)) {
+//                        ForEach(expenses.items.filter { $0.type == type }) { item in
+//                            
+//                            
+//                            HStack {
+//                                VStack(alignment: .leading) {
+//                                    Text(item.name)
+//                                        .font(.headline)
+//                                    Text(item.type)
+//                                }
+//                                
+//                                Spacer()
+//                                Text(item.amount, format: .currency(code: item.currency))
+//                            }
+//                            .listRowBackground(Color.white.opacity(item.amount < 10 ? 0.4 : (item.amount < 100 && item.amount > 10) ? 0.6 : 0.8))
+//                            
+//                        }
+//                        .onDelete {
+//                            contentView.removeItems(at: $0)
+//                            expenses.calculateTotals()
+//                        }
+//                    }
                 }
                 .navigationTitle(type)
                 .scrollContentBackground(.hidden)
@@ -65,6 +64,6 @@ struct SplitList: View {
 //    }
 }
 
-#Preview {
-    SplitList(expenses: Expance(), type: "Personal")
-}
+//#Preview {
+//    SplitList(expenses: Expance(), type: "Personal")
+//}

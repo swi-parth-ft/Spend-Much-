@@ -4,58 +4,15 @@
 //
 //  Created by Parth Antala on 2024-07-08.
 //
-
+import SwiftData
 import SwiftUI
 import Observation
 
-
-
-struct Item: Identifiable, Codable {
-    var id = UUID()
-    var name: String
-    var type: String
-    var amount: Double
-    var currency: String
-
-}
-
-@Observable
-class Expance {
-    var totalPersonal: Double = 0.0
-    var totalBusiness: Double = 0.0
-    
-    var items = [Item](){
-        didSet {
-            if let encoded = try? JSONEncoder().encode(items) {
-                UserDefaults.standard.set(encoded, forKey: "Items")
-            }
-        }
-    }
-    
-    init() {
-        print("Expance initialized.")
-        if let savedItems = UserDefaults.standard.data(forKey: "Items") {
-            if let decodedItems = try? JSONDecoder().decode([Item].self, from: savedItems) {
-                items = decodedItems
-                calculateTotals()
-                return
-            }
-            
-        }
-
-        items = []
-    }
-    
-    func calculateTotals() {
-            totalPersonal = items.filter { $0.type == "Personal" }.map { $0.amount }.reduce(0, +)
-            totalBusiness = items.filter { $0.type == "Business" }.map { $0.amount }.reduce(0, +)
-        print("Total Personal: \(totalPersonal), Total Business: \(totalBusiness)") // Debug print to verify totals
-    }
-    
-}
-
 struct ContentView: View {
-    @State private var expance = Expance()
+    
+    @Environment(\.modelContext) var modelContext
+    @Query var items: [Items]
+    
     @State private var showingAddExpense = false
     @State private var showingPersonalList = false
     @State private var showingBusinessList = false
@@ -84,8 +41,6 @@ struct ContentView: View {
                 
                 VStack {
                     ZStack {
-                        
-                        
                         RoundedRectangle(cornerRadius: 20)
                             .fill(.white)
                             .opacity(0.4)
@@ -96,27 +51,27 @@ struct ContentView: View {
                         HStack {
                             VStack {
                                 Text("Personal")
-                                Text("\(expance.totalPersonal, format: .currency(code: "USD"))")
+                                Text("\(totalPersonal, format: .currency(code: "USD"))")
                             }
                             .onTapGesture {
                                 showingPersonalList = true
                             }
-                            .sheet(isPresented: $showingPersonalList) {
-                                SplitList(expenses: expance, type: "Personal")
-                                    .presentationDetents([.fraction(0.4), .medium, .large])
-                            }
+//                            .sheet(isPresented: $showingPersonalList) {
+//                                SplitList(expenses: expance, type: "Personal")
+//                                    .presentationDetents([.fraction(0.4), .medium, .large])
+//                            }
                             Spacer()
                             VStack {
                                 Text("Business")
-                                Text("\(expance.totalBusiness, format: .currency(code: "USD"))")
+                                Text("\(totalBusiness, format: .currency(code: "USD"))")
                             }
                             .onTapGesture {
                                 showingBusinessList = true
                             }
-                            .sheet(isPresented: $showingBusinessList) {
-                                SplitList(expenses: expance, type: "Business")
-                                    .presentationDetents([.fraction(0.4), .medium, .large])
-                            }
+//                            .sheet(isPresented: $showingBusinessList) {
+//                                SplitList(expenses: expance, type: "Business")
+//                                    .presentationDetents([.fraction(0.4), .medium, .large])
+//                            }
                         }
                         .padding(55)
 
@@ -126,7 +81,7 @@ struct ContentView: View {
                    
                 List {
                     Section(header: Text("All entries").foregroundColor(.white)) {
-                        ForEach(expance.items) { item in
+                        ForEach(items) { item in
                             
                             
                             HStack {
@@ -142,21 +97,26 @@ struct ContentView: View {
                             .listRowBackground(Color.white.opacity(item.amount < 10 ? 0.4 : (item.amount < 100 && item.amount > 10) ? 0.6 : 0.8))
                             
                         }
-                        .onDelete(perform: removeItems)
+                        .onDelete(perform: deleteItems)
                     }
                 }
                 .scrollContentBackground(.hidden)
                 .navigationTitle("Expenses")
                 .toolbar {
-                    Button("Add Expense", systemImage: "plus") {
-                        showingAddExpense = true
-                    }
-                    .buttonStyle()
+                 
+                        Button("Add Expense", systemImage: "plus") {
+                            showingAddExpense = true
+                        }
+                        .buttonStyle()
+                    
+                    
                 }
                 .sheet(isPresented: $showingAddExpense) {
-                    // show an AddView here
-                    AddView(expenses: expance)
+                    AddView(totalPersonal: $totalPersonal, totalBusiness: $totalBusiness)
                         .presentationDetents([.fraction(0.4), .medium, .large])
+                }
+                .onAppear {
+                    calculateTotal()
                 }
             }
         }
@@ -164,15 +124,23 @@ struct ContentView: View {
         }
     }
     
-    func removeItems(at offsets: IndexSet) {
-       expance.items.remove(atOffsets: offsets)
-      
-        expance.calculateTotals()
+    func deleteItems(_ indexSet: IndexSet) {
+        for i in indexSet {
+            let item = items[i]
+            if item.type == "Personal" {
+                totalPersonal -= item.amount
+            } else {
+                totalBusiness -= item.amount
+            }
+            modelContext.delete(item)
+        }
+        
     }
-  
-   
-    
-    
+ 
+    func calculateTotal() {
+        totalPersonal = items.filter { $0.type == "Personal" }.map { $0.amount }.reduce(0, +)
+        totalBusiness = items.filter { $0.type == "Business" }.map { $0.amount }.reduce(0, +)
+    }
 }
 
 struct ButtonViewModifier: ViewModifier {
